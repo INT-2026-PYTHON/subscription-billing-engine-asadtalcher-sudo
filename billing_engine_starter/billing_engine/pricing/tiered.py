@@ -34,9 +34,42 @@ class TieredPricing(PricingStrategy):
     """Charges across multiple price tiers based on cumulative quantity."""
 
     def __init__(self, tiers: list[Tier]) -> None:
-        # TODO Day 1
-        raise NotImplementedError("Day 1: implement TieredPricing.__init__")
+        if not tiers:
+            raise ValueError("tiers must not be empty")
+
+        expected_from = 0
+        seen_open_ended = False
+
+        for tier in tiers:
+            if seen_open_ended:
+                raise ValueError("no tiers allowed after open-ended tier")
+
+            if tier.from_units < 0:
+                raise ValueError("from_units must be non-negative")
+
+            if tier.from_units != expected_from:
+                raise ValueError("tiers must be contiguous and ordered")
+
+            if tier.to_units is None:
+                seen_open_ended = True
+            else:
+                if tier.to_units <= tier.from_units:
+                    raise ValueError("to_units must be greater than from_units")
+                expected_from = tier.to_units
+
+        self.tiers = tiers
 
     def calculate(self, quantity: int) -> Money:
-        # TODO Day 1
-        raise NotImplementedError("Day 1: implement TieredPricing.calculate")
+        total = Money.zero()
+
+        for tier in self.tiers:
+            if quantity <= tier.from_units:
+                continue
+
+            upper = quantity if tier.to_units is None else min(quantity, tier.to_units)
+            units_in_tier = upper - tier.from_units
+
+            if units_in_tier > 0:
+                total = total + (tier.unit_price * units_in_tier)
+
+        return total
