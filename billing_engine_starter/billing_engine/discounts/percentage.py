@@ -22,3 +22,4 @@ class PercentageDiscount(Discount):
 
     def apply(self, subtotal: Money, context: DiscountContext) -> Money:
         return subtotal * self.percentage
+# changes done
