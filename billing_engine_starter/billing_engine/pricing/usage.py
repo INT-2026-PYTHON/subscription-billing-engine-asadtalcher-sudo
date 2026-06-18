@@ -12,8 +12,16 @@ class UsageBased(PricingStrategy):
     """Charges `unit_price * quantity`."""
 
     def __init__(self, unit_price: Money) -> None:
-         self.unit_price = unit_price
+        if not isinstance(unit_price, Money):
+            raise TypeError("unit_price must be Money")
+        if unit_price.amount < 0:
+            raise ValueError("unit_price must be non-negative")
+        self.unit_price = unit_price
+
+         
 
     def calculate(self, quantity: int) -> Money:
+        if quantity < 0:
+            raise ValueError("quantity must be non-negative")
         return self.unit_price * quantity
         

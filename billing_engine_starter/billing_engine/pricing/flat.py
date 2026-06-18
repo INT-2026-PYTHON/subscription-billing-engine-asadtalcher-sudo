@@ -12,6 +12,10 @@ class FlatRate(PricingStrategy):
     """Charges a fixed amount every billing period."""
 
     def __init__(self, amount: Money) -> None:
+        if not isinstance(amount, Money):
+            raise TypeError("amount must be Money")
+        if amount.amount < 0:
+            raise ValueError("amount must be non-negative")
         self.amount = amount
 
     def calculate(self, quantity: int) -> Money:
